@@ -1,0 +1,33 @@
+name: Build EXE
+
+on:
+  workflow_dispatch:  # Avvio manuale
+  push:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install pyinstaller
+        pip install tkinterdnd2 Pillow trimesh numpy scipy scikit-image requests
+    
+    - name: Build EXE
+      run: |
+        pyinstaller --onefile --windowed --name=Generatore3D --hidden-import=tkinterdnd2 --hidden-import=PIL._imagingtk --hidden-import=scipy.ndimage --hidden-import=skimage.measure photo_to_3d_generator.py
+    
+    - name: Upload EXE
+      uses: actions/upload-artifact@v3
+      with:
+        name: Generatore3D-Windows
+        path: dist/Generatore3D.exe
